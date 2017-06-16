@@ -21,6 +21,7 @@ int numOfHipstersArrived = -1;
 pthread_mutex_t threadHipsterMutex[MAX_THREADS];
 pthread_mutex_t lock;
 pthread_t threadHipster[MAX_THREADS];
+char buffer[40];
 
 char *CodeValue;
 int length;
@@ -30,19 +31,23 @@ void *Barrier(void *arg)
     int threadNumber = *(int *)arg;
     if (threadNumber == 0 && meetFirst == 1)
     {
+        pthread_mutex_lock(&lock);
         // printf("\t\t%s\n", CodeValue);
         write_resource(&codeWordResource, CodeValue, length);
+        pthread_mutex_unlock(&lock);
     }
     if (threadNumber == hipCount && meetFirst == 0)
     {
         // printf("\t\t%s\n", CodeValue);
         write_resource(&codeWordResource, CodeValue, length);
     }
-    printf("Thread number is %d and hipsCount is %d\n", threadNumber, hipCount);
+    // printf("Thread number is %d and hipsCount is %d\n", threadNumber, hipCount);
     pthread_mutex_unlock(&threadHipsterMutex[threadNumber]);
-    while (threadNumber < hipCount)
+    while (numOfHipstersArrived != hipCount)
     {
     }
+    read_resource(&codeWordResource, buffer, 40);
+    printf("The code word is %s\n", codeWordResource.value);
 }
 
 void initialize_meetup(int n, int mf)

@@ -3,7 +3,7 @@
 
 #include "requests.h"
 
-#define COMM_PORT  18301
+#define COMM_PORT  18300
 
 pc_op_t parse_request(char *request, char *value);
 void    send_http_response(int fd, char *message);

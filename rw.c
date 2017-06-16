@@ -32,39 +32,34 @@ void initialize_readers_writer()
 void rw_read(char *value, int len)
 {
     // printf("NOTHING IMPLEMENTED YET FOR rw_read\n");
-    while (1)
+    // printf("Reader called\n");
+    sem_wait(&mutexRead);
+    if (data.num_reads == 1)
     {
-        sem_wait(&mutexRead);
-        data.num_reads += 1;
-        if (data.num_reads == 1)
-        {
-            sem_wait(&mutexWrite);
-        }
-        sem_post(&mutexRead);
-
-        //read here
-
-        sem_post(&mutexRead);
-        sem_wait(&mutexRead);
-        data.num_reads -= 1;
-        if (data.num_reads == 0)
-        {
-            sem_post(&mutexWrite);
-        }
-        sem_post(&mutexRead);
-        //non critical region
+        // printf("The read mutex is set\n");
+        sem_wait(&mutexWrite);
     }
+    sem_post(&mutexRead);
+
+    read_resource(&data, value, len);
+
+    sem_wait(&mutexRead);
+    data.num_reads -= 1;
+    // printf("The num_reads are %d\n",data.num_reads);
+    if (data.num_reads == 0)
+    {
+        sem_post(&mutexWrite);
+        // printf("the Db is released\n");
+    }
+    sem_post(&mutexRead);
+    //non critical region
 }
 
 void rw_write(char *value, int len)
 {
-    // printf("NOTHING IMPLEMENTED YET FOR rw_write\n");
-    while(1){
-        sem_wait(&mutexWrite);
-
-        //write 
-
-        sem_post(&mutexWrite);
-    }
-
+    // printf("Write is called\n");
+    sem_wait(&mutexWrite);
+    write_resource(&data, value, len);
+    // printf("Written");
+    sem_post(&mutexWrite);
 }

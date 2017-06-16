@@ -2,6 +2,7 @@
 #define _MEETUP_H_
 
 #define MAX_VALUE_LEN 80
+#define MAX_THREADS 16
 #define MEET_LAST 0
 #define MEET_FIRST 1
 

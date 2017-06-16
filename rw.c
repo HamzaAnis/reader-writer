@@ -14,20 +14,57 @@
  */
 
 static resource_t data;
+sem_t mutexRead;
+sem_t mutexWrite;
 
-void initialize_readers_writer() {
+void initialize_readers_writer()
+{
     /*
      * Initialize the shared structures, including those used for
      * synchronization.
      */
+    init_resource(&data, "Reader Writer");
+    //  print_stats(&data);
+    sem_init(&mutexRead, 0, 1);
+    sem_init(&mutexWrite, 0, 1);
 }
 
+void rw_read(char *value, int len)
+{
+    // printf("NOTHING IMPLEMENTED YET FOR rw_read\n");
+    while (1)
+    {
+        sem_wait(&mutexRead);
+        data.num_reads += 1;
+        if (data.num_reads == 1)
+        {
+            sem_wait(&mutexWrite);
+        }
+        sem_post(&mutexRead);
 
-void rw_read(char *value, int len) {
-    printf("NOTHING IMPLEMENTED YET FOR rw_read\n");
+        //read here
+
+        sem_post(&mutexRead);
+        sem_wait(&mutexRead);
+        data.num_reads -= 1;
+        if (data.num_reads == 0)
+        {
+            sem_post(&mutexWrite);
+        }
+        sem_post(&mutexRead);
+        //non critical region
+    }
 }
 
+void rw_write(char *value, int len)
+{
+    // printf("NOTHING IMPLEMENTED YET FOR rw_write\n");
+    while(1){
+        sem_wait(&mutexWrite);
 
-void rw_write(char *value, int len) {
-    printf("NOTHING IMPLEMENTED YET FOR rw_write\n");
+        //write 
+
+        sem_post(&mutexWrite);
+    }
+
 }

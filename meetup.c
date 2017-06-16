@@ -13,7 +13,7 @@
  * variables -- must START here.
  */
 
-static resource_t data;
+static resource_t codeWordResource;
 
 int hipCount = 0;
 int meetFirst = 0;
@@ -22,10 +22,23 @@ pthread_mutex_t threadHipsterMutex[MAX_THREADS];
 pthread_mutex_t lock;
 pthread_t threadHipster[MAX_THREADS];
 
+char *CodeValue;
+int length;
+
 void *Barrier(void *arg)
 {
     int threadNumber = *(int *)arg;
-    printf("Thread number is %d and hipsCount is%d\n", threadNumber, hipCount);
+    if (threadNumber == 0 && meetFirst == 1)
+    {
+        // printf("\t\t%s\n", CodeValue);
+        write_resource(&codeWordResource, CodeValue, length);
+    }
+    if (threadNumber == hipCount && meetFirst == 0)
+    {
+        // printf("\t\t%s\n", CodeValue);
+        write_resource(&codeWordResource, CodeValue, length);
+    }
+    printf("Thread number is %d and hipsCount is %d\n", threadNumber, hipCount);
     pthread_mutex_unlock(&threadHipsterMutex[threadNumber]);
     while (threadNumber < hipCount)
     {
@@ -77,6 +90,8 @@ void join_meetup(char *value, int len)
         fprintf(stderr, "Could not create %d thread\n", numOfHipstersArrived);
         return;
     }
+    CodeValue = value;
+    length = len;
     // printf("In main thread is %d\n", numOfHipstersArrived);
     numOfHipstersArrived++;
 }
